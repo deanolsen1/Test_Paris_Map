@@ -3,7 +3,6 @@
 $(document).ready(function() {
 	var markers;
 	// Possible heat map layer var
-	var zl = document.getElementById('zoomlens');
     var SMFilter = [];
 	var PageFilter = [];
 	var thisPage = 9; //sets the first page of the counter to page 9
@@ -142,14 +141,14 @@ $(document).ready(function() {
             SMs : SMs,
             pages : pages.sort(function(a,b){return a - b}),
             SMCount : SMCount
-        };
+        };        console.log([SMTracker])
+
     };
 
     //function to create symbols
     function createPropSymbols(info, data, currentPage, speed) {
         console.log(info)
         console.log(data)
-        console.log(currentPage)
         console.log(speed)
 
 
@@ -176,7 +175,6 @@ $(document).ready(function() {
 				};
 			}
         },
-
         //opacity of markers, transition time for black circle to appear
 		pointToLayer: function(feature, latlng) {
 
@@ -207,7 +205,8 @@ $(document).ready(function() {
 		}).addTo(map);
 		updatePropSymbols();
 
-	} // end createPropSymbols()
+	} 	// end createPropSymbols()
+
 
 	//color of markers
     function PropColor(SM) {
@@ -411,13 +410,15 @@ $(document).ready(function() {
 	}	// end createTemporalLegend()
 
 	// magnifier glass experiment
+
+	var zl = document.getElementById('zoomlens');
+
 	var zoommap = L.mapbox.map('zoommap', 'deanolsen1.l4i434a2', {
     fadeAnimation: false,
     zoomControl: false,
     clickable: true,
     attributionControl: false
 	});
-
 
 	// Call update or zoom functions when
 	// these events occur.
