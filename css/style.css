@@ -1,4 +1,7 @@
 /*CSS style sheet for map page*/
+.clr {
+	clear:both;
+}
 
 .nav ul {
   list-style: none;
@@ -48,10 +51,11 @@
     padding: 10px 10px 10px 10px;
 	z-index: 21;
 	margin-bottom: 0px;
-	right: 35px;
+    right: 2.2%;
 	top: 1165px;
 	background: rgba(58,55,55,.5);
 	border: thin solid #523535;
+	margin-right:15px;
 }
 
 .title {
@@ -104,7 +108,7 @@ div.scroll {
 	height: 85%;
 	margin-left: 3px;
 	margin-bottom: 3px;
-	overflow: scroll;
+	overflow-y: scroll;
 	z-index: 10;
 	padding-top: 3px;
 	padding-right: 3px;
@@ -124,7 +128,7 @@ div.scroll {
 #map{
 	height: 1020px;
 	opacity: 1;
-	width: 98%;
+	width: 97%;
 	font-family: arapey;
 	font-style: normal;
 	font-weight: 400;
@@ -173,6 +177,9 @@ body{
 	font-style: normal;
 	font-weight: 400;
 	color: #675A5A;
+	min-width: 900px;
+	min-height: 700px;
+	overflow-x: hidden;
 }
 
 /*SM markers*/
@@ -232,7 +239,7 @@ body{
 
 /*Magnifier glass
 */
-#zoommap {
+#zoommap,.zoommap  {
   background: #73b5e5;
   position: absolute;
   z-index: 20;
@@ -246,7 +253,10 @@ body{
           transform:rotate(-60deg);
 }
 
-#zoomlens {
+.leaflet-map-pane, .leaflet-popup-pane, .leaflet-objects-pane { z-index: 1001;}
+
+#zoomlens,.zoomlens  {
+margin-top: 15px;
   overflow: visible;
   top: -9999px;
   left: -9999px;
@@ -260,7 +270,7 @@ body{
 
 .overlay {
   position: absolute;
-  pointer-events: none;
+ /* pointer-events: none;*/
   overflow: hidden;
   width: 200px;
   height: 200px;

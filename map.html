@@ -28,75 +28,66 @@
 
 <body>
 
-	<header>
-		<div class="nav">
-      	<ul>
-        	<li class="index"><a href="index.html">Introduction</a></li>
-        	<li class="map"><a href="map.html">Interactive Map</a></li>
-        	<li class="credits"><a href="credits.html">Credits</a></li>
-      	</ul>
-		</div>
-	</header>
+    <header>
+        <div class="nav">
+        <ul>
+            <li class="index"><a href="index.html">Introduction</a></li>
+            <li class="map"><a href="map.html">Interactive Map</a></li>
+            <li class="credits"><a href="credits.html">Credits</a></li>
+        </ul>
+        </div>
+    </header>
 
-	<div id="banner">
-    	<img src="img/arch_cropped.png" alt=""/>
-    	<!-- Dean: anglisized name -->
-    	<h1>Interactive Map of <br>
-    	  Clerc&#8217;s 10th Arrondissement</h1>
-	</div>
+    <div id="banner">
+        <img src="img/arch_cropped.png" alt=""/>
+        <!-- Dean: anglisized name -->
+        <h1>Interactive Map of <br>
+          Clerc&#8217;s 10th Arrondissement</h1>
+    </div>
     
-	<div id="menu">
-    	<h2>Subjective Markers</h2>
+    <div id="menu">
+        <h2>Subjective Markers</h2>
 
-    	<button id = "checkAllBtn" class= "button">Check All</button>
-    	<button id = "uncheckAllBtn" class= "button">Uncheck All</button>
-   	 	<button id = "resetMapBtn" class= "button">Reset Map</button>
-    	<!-- <br></br> -->
-    	<p id="checkedNum"></p>
- 		<!-- <br></br> -->
-    	<div id="SubjectiveMarkers" class="scroll">
-    	</div>
-	</div>
-
-	<div id='map'>
-                    <!-- Magnifier Glass components -->    
-    <div id='zoomlens' class='overlay'>
-    <div class='overlay rotater'>
-        <div class='overlay rotater'>
-            <div id='zoommap' class='overlay'></div>
+        <button id = "checkAllBtn" class= "button">Check All</button>
+        <button id = "uncheckAllBtn" class= "button">Uncheck All</button>
+        <button id = "resetMapBtn" class= "button">Reset Map</button>
+        <!-- <br></br> -->
+        <p id="checkedNum"></p>
+        <!-- <br></br> -->
+        <div id="SubjectiveMarkers" class="scroll">
         </div>
     </div>
-        <div id='border' class='overlay'></div>
+
+    <div id='map'>
     </div>
-<!-- End magnifier components -->
-    </div>
-            <!-- Magnifier Glass components -->    
+    <!-- Magnifier Glass components -->   
     <div id='zoomlens' class='overlay'>
-    <div class='overlay rotater'>
         <div class='overlay rotater'>
-            <div id='zoommap' class='overlay'></div>
+            <div class='overlay rotater'>
+                <div id='zoommap' class='overlay'></div>
+            </div>
         </div>
-    </div>
         <div id='border' class='overlay'></div>
     </div>
+    <div id="dvAllMyZooms"></div>
 <!-- End magnifier components -->
 
 
 
-	<div id='leaflet-bottom leaflet-left'></div>
+    <div id='leaflet-bottom leaflet-left'></div>
 
-	<!--vcr controls-->
-	<div id="vcr-controls">
-		<!-- <a class="title">Control Timeline<br></a> -->
-		<a class="vcr back-full"><img src="img/skip-back.png" alt="back full"/></a>
- 		<a class="vcr back"><img src="img/step-back.png" alt="back"/></a>
- 		<a class="vcr play"><img src="img/play.png" alt="play"/></a>
- 		<a class="vcr pause"><img src="img/pause.png" alt="pause"/></a>
- 		<a class="vcr step"><img src="img/step-ahead.png" alt="forward"/></a>
- 		<a class="vcr step-full"><img src="img/skip-full.png" alt="step full"/></a>
- 		<a class="vcr faster"><img src="img/faster.png" alt="Increase Speed"/></a>
- 		<a class="vcr slower"><img src="img/slower.png" alt="Decrease Speed"/></a>
- 	</div>
+    <!--vcr controls-->
+    <div id="vcr-controls">
+        <!-- <a class="title">Control Timeline<br></a> -->
+        <a class="vcr back-full"><img src="img/skip-back.png" alt="back full"/></a>
+        <a class="vcr back"><img src="img/step-back.png" alt="back"/></a>
+        <a class="vcr play"><img src="img/play.png" alt="play"/></a>
+        <a class="vcr pause"><img src="img/pause.png" alt="pause"/></a>
+        <a class="vcr step"><img src="img/step-ahead.png" alt="forward"/></a>
+        <a class="vcr step-full"><img src="img/skip-full.png" alt="step full"/></a>
+        <a class="vcr faster"><img src="img/faster.png" alt="Increase Speed"/></a>
+        <a class="vcr slower"><img src="img/slower.png" alt="Decrease Speed"/></a>
+    </div>
 
 
 </body>

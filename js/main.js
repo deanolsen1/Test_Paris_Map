@@ -1,12 +1,33 @@
 // Javascript for map page
 
+
+ function SizeMe(map) {
+	//Dynamically Resize Body
+	$("body").height($(window).outerHeight()-40);
+	$("body").width($(window).outerWidth());
+	
+	var iBodyWidth = $("body").width();
+	var iBodyHeight = $("body").height();
+	var iMenuOffset = 38;
+	var iSubMenuOffset = 151;
+	var iVCRHeight = 49;
+	var iVCROffset = 30;
+	
+	$("#map").height($("body").height() - $("#map").offset().top);
+	$("#menu").height($("#map").height() - iMenuOffset);
+	$("#vcr-controls").css("top",($("#map").offset().top + $("#map").height()- iVCRHeight -iVCROffset) + "px")
+	$("#SubjectiveMarkers").height($("#menu").height() - iSubMenuOffset);
+	map.invalidateSize();
+}
+
 $(document).ready(function() {
 	var markers;
+	var iZoomNum = 0;
 	// Possible heat map layer var
     var SMFilter = [];
 	var PageFilter = [];
 	var thisPage = 9; //sets the first page of the counter to page 9
-	var speed; //controls the interval of the increase/decrease speed functions.  
+	var speed = 100; //controls the interval of the increase/decrease speed functions.  
 		//Speed acts as the inverse of time.  Increase in speed value == increase in pause
 	var interval; //variable that holds several values for info data and speed
 
@@ -26,6 +47,11 @@ $(document).ready(function() {
      //   	map.setView([48.876, 2.357], 15)}, 6000);
       //uncomment following line for non-zoomed map view
        	map.setView([48.876, 2.357], 15);
+		
+	//Setup and initialize dynamic document resize functionality
+	//In lieu of a better solution - the margin and removal is a hack to keep the vcr looking nice
+	$(window).resize(function () { $("#vcr-controls").css("margin-right","0px"); SizeMe(map) });
+	 SizeMe(map);
 
 
 	// extra way of zooming in -- has plus button and minus button for zooming
@@ -92,6 +118,12 @@ $(document).ready(function() {
            SMFilter.push($(this).val());
        	});
 
+		//Remove old map info
+		$( "input:checkbox[name=SMFilter]").not(":checked").each(function(){
+			//console.log($(this).val());
+			$("." + CleanFName($(this).val())).remove();
+       	});
+
 		$("#checkedNum").html(SMFilter.length + " categories are checked")		
         createPropSymbols(info, data);
     }
@@ -145,18 +177,38 @@ $(document).ready(function() {
 
     };
 
+	function CleanFName(s){
+		//Strip spaces, nonalphanumeric, and make lower
+		return s.replace(/\s/g,"").replace(/[^a-zA-Z 0-9]+/g, '').toLowerCase();
+	}
+	
+	function GetZOb(f){
+		console.log(f);
+		f.latlng =  new L.LatLng(f.target._animateToCenter.lat,f.target._animateToCenter.lng)
+		$.extend(f,map.latLngToContainerPoint(f.latlng));
+		return f;
+	}
+	
     //function to create symbols
-    function createPropSymbols(info, data, currentPage, speed) {
+    function createPropSymbols(info, data, currentPage, speed,isVCR) {
         console.log(info)
         console.log(data)
         console.log(speed)
-
-
+		console.log(isVCR);
+		
 
         if (map.hasLayer(markers)){
             map.removeLayer(markers);
         	};
-
+			
+		//if we are playing we should only show one at a time;
+		if(isVCR) {
+			$("#dvAllMyZooms").empty();
+		}
+		
+		//For bounding later
+		var arrCoord = [];
+		
        //filter to load the markers that are in selected pages or in check box
 		markers = L.geoJson(data, {
             filter: function(feature, layer) {
@@ -177,34 +229,93 @@ $(document).ready(function() {
         },
         //opacity of markers, transition time for black circle to appear
 		pointToLayer: function(feature, latlng) {
+				arrCoord.push([latlng.lat,latlng.lng]);
+			    //To keep the map program happy - not visible
+				var circle = L.circle(latlng, 200,{
+                    fillColor: PropColor(feature.properties.SM),
+				    color: PropColor(feature.properties.SM),
+					stroke: false,
+                    weight: 4,
+                    clickable: true,
+				    fillOpacity: 0.0,
+					opacity: 0.0
+                });
+			
+				var e = map.latLngToContainerPoint(latlng);
+				e.latlng = latlng;
+				var fName = CleanFName(feature.properties.SM)
+				var createZoom = function(e) { 
+						//generate id instance
+						var idZ = "zoomlens" + iZoomNum;
+						var idO = "olay" + iZoomNum;
+						var idM = "zoommap" + iZoomNum++;
+						
+						//append html
+						$("#dvAllMyZooms").append("<div id='"+idZ+"' class='zoomlens "+CleanFName(fName )+" overlay'><div id='"+idO+"' class='overlay rotater'><div class='overlay rotater'><div id='"+idM+"' class='zoommap overlay'></div></div></div><div id='border' class='overlay'></div></div>");
+		
+						//grab on page object
+						var oZlens = document.getElementById(idZ);
+						
+						//Boiler Plate Setup
+						var zmap = L.mapbox.map(idM, 'deanolsen1.l4i434a2', {
+							fadeAnimation: false,
+							zoomControl: false,
+							clickable: true,
+							attributionControl: false
+						});
+						
+						zoomIt = function(e) {
+							if (zmap._loaded) zmap.setZoom(map.getZoom() +1);
+						};
 
+						updateLens = function(e) {
+							oZlens.style.top = (e.y -10)  + 'px';
+							oZlens.style.left = (e.x - 10) + 'px';
+							zmap.setView(e.latlng, map.getZoom() + 0, true);
+						};
+						
+						map.on("zoomend",function (){ 
+							updateLens(e)
+							zoomIt(e);	
+						})
+						
+						map.on("dragend",function (){ 
+							updateLens(e)
+							zoomIt(e);	
+						})
+						
+						//Create Lens
+						updateLens(e)
+						zoomIt(e);	
+						
+						$("#"+idZ).on({
+							mouseover: function(e) {
+								circle.openPopup();
+							},
+							mouseout: function(e) {
+								//circle.closePopup();
+							}
+						});								
+					};
+					
+			createZoom(e);	
+			
+		
 			/*instead of returning circles (SVG elements),
 			you need to return a div with a unique id attribute
 			that can then be used to create a new L.mapbox.map 
 			(your zoommap)
 			*/
-			return L.circle(latlng, 200,{
-                    fillColor: PropColor(feature.properties.SM),
-				    color: PropColor(feature.properties.SM),
-                    weight: 4,
-                    clickable: true,
-				    fillOpacity: 0.2,
-                }).on({
-					mouseover: function(e) {
-						this.openPopup();
-						//black ring around markers
-						this.setStyle({color: '#000000'});
-					},
-					mouseout: function(e) {
-						this.closePopup();
-						this.setStyle({color: PropColor(feature.properties.SM) });
-					},
-					click: update
-				});
+			return circle;
+				
+		
+				
 			}
 		}).addTo(map);
 		updatePropSymbols();
-
+		if(arrCoord.length > 0){
+			map.fitBounds(arrCoord);
+		}
 	} 	// end createPropSymbols()
 
 
@@ -357,7 +468,7 @@ $(document).ready(function() {
 		if (thisPage >9) {
 			thisPage--; 
 		}; 
-		createPropSymbols(info, data, thisPage, speed);
+		createPropSymbols(info, data, thisPage, speed, true);
 		$("input[type=range]").val(thisPage);
 		$(".temporal-legend").text( "On Page " + thisPage);
 	}
@@ -365,7 +476,8 @@ $(document).ready(function() {
 	//function to allow counter and data to increment by one
 	function goForward(info, data, speed){
 		thisPage++; 
-		createPropSymbols(info, data, thisPage, speed);
+		console.log(speed);
+		createPropSymbols(info, data, thisPage, speed, true);
 		$("input[type=range]").val(thisPage);
 		$(".temporal-legend").text( "On Page " + thisPage);
 	}
@@ -374,7 +486,8 @@ $(document).ready(function() {
 		if (thisPage <238) {
 			thisPage++; 
 			};
-		createPropSymbols(info, data, thisPage,speed);
+			console.log(speed)
+		createPropSymbols(info, data, thisPage,speed, true);
 		$("input[type=range]").val(thisPage);
 		$(".temporal-legend").text( "On Page " + thisPage);
 	}
@@ -382,7 +495,7 @@ $(document).ready(function() {
 	//takes the user to the last page (238)
 	function stepFull(info, data, speed){
 		thisPage=238; 
-		createPropSymbols(info, data, thisPage);
+		createPropSymbols(info, data, thisPage,speed, true);
 		$("input[type=range]").val(thisPage);
 		$(".temporal-legend").text( "On Page " + thisPage);
 	}
@@ -390,7 +503,7 @@ $(document).ready(function() {
 	//vcr control to first page, pg 9--book starts on pg 9
 	function backFull(info, data, speed){
 		thisPage=9; 
-		createPropSymbols(info, data, thisPage);
+		createPropSymbols(info, data, thisPage,speed, true);
 		$("input[type=range]").val(thisPage);
 		$(".temporal-legend").text( "On Page " + thisPage);
 	}
@@ -420,18 +533,21 @@ $(document).ready(function() {
     attributionControl: false
 	});
 
-	// Call update or zoom functions when
+	/*// Call update or zoom functions when
 	// these events occur.
 	map.on('click', update);
-	map.on('zoomend', zoom);
+	map.on('zoomend', zoom);*/
 
 	function zoom(e) {
-	    if (zoommap._loaded) zoommap.setZoom(e.target.getZoom() +1);
+	    if (zoommap._loaded) zoommap.setZoom(map.getZoom() +1);
 	}
 
 	function update(e) {
-	    zl.style.top = ~~e.containerPoint.y - 100 + 'px';
-	    zl.style.left = ~~e.containerPoint.x - 100 + 'px';
+		//console.log(e);
+	   // zl.style.top = e.containerPoint.y - 100 + 'px';
+	   // zl.style.left = e.containerPoint.x - 100 + 'px';
+	    zl.style.top = (e.containerPoint.y -10)  + 'px';
+	    zl.style.left = (e.containerPoint.x - 10) + 'px';
 	    zoommap.setView(e.latlng, map.getZoom() + 0, true);
 	}
 
